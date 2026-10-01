@@ -73,7 +73,33 @@ pytest --cov=alarm_clock
 
 ## Architecture
 
-- `alarm_clock/models.py`: Alarm and AlarmManager classes
-- `alarm_clock/clock.py`: Time display and alarm checking logic
-- `alarm_clock/cli.py`: Command-line interface using argparse
-- `alarm_clock/__main__.py`: Entry point
+The application follows a simple layered architecture:
+
+### Data Layer (`alarm_clock/models.py`)
+- **Alarm**: Dataclass representing a single alarm with `id`, `time`, and `active` status
+- Simple immutable data structure with no business logic
+
+### Business Logic Layer (`alarm_clock/clock.py`)
+- **AlarmClock**: Core class managing alarm lifecycle
+  - `set_alarm()`: Creates and stores a new alarm
+  - `list_alarms()`: Returns a copy of all alarms
+  - `cancel_alarm()`: Deactivates an alarm by ID
+  - `check_due_alarms()`: Checks which alarms should trigger at current time
+- JSON persistence for alarm state (saved to `alarms.json`)
+- Configurable storage (can disable persistence for testing)
+
+### Presentation Layer (`alarm_clock/cli.py`)
+- **CLI interface**: argparse-based command-line parser
+- Commands: `set`, `list`, `cancel`, `run`
+- Input validation with clear error messages
+- User-friendly output formatting
+
+### Entry Point (`alarm_clock/__main__.py`)
+- Simple module entry point that delegates to CLI main function
+
+### Design Decisions
+- **No external dependencies**: Uses only Python standard library
+- **JSON persistence**: Simple file-based storage (no database)
+- **Single-threaded**: Blocking loop for simplicity
+- **Testable**: Storage can be disabled for unit tests
+- **Cross-platform**: Works on Windows, macOS, and Linux
